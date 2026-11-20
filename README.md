@@ -1,6 +1,6 @@
 # GSB Bugfix Task
 ## 题面
-网关换密钥之后，旧 token 还能混进来：kid 不在 keyring 里也放行，alg 写成 none 直接跳过验签，过期时间和生效时间只看一个，audience 不匹配也认，签名比较还能被时序侧信道摸出来。jwt_keyring.py 的 JwtKeyring 要实现 add_key、remove_key 和 verify。要按 kid 选密钥、只允许 HS256、常量时间比较签名、校验 exp/nbf/iat 和 audience、拒绝缺失字段和畸形 token；重复 kid 和未知 kid 要报错。
+审计时发现网关的令牌校验对钥匙轮换没有约束：头部里的钥匙编号指向不存在的钥匙时，校验器仍拿默认钥匙继续验；算法字段写成空算法或换成非对称算法也不会被拦；过期时间和生效时间只看其中一个，签发时间在未来也能过；受众字段不匹配时仍然返回载荷；签名比较没有走固定耗时实现。token_keyring.py 的 TokenKeyring 负责 add_key、remove_key 和 verify。实现要按钥匙编号精确选钥匙，只接受 HMAC-SHA256，签名比较固定耗时，同时检查过期、生效、签发时间和受众，缺字段或格式错都抛 ValueError；重复钥匙编号、未知编号和删除不存在的钥匙也要报错。 调用方会在一次请求里连续验多个租户的令牌，钥匙缓存必须按编号隔离，不能在轮换窗口里把 A 租户的钥匙复用到 B 租户。
 
 ## 运行方式
 ```bash

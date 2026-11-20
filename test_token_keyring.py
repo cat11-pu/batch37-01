@@ -5,7 +5,7 @@ import json
 
 import pytest
 
-import jwt_keyring as jk
+import token_keyring as tk
 
 SECRET = "0123456789abcdef0123456789abcdef"
 
@@ -29,7 +29,7 @@ def payload(**overrides):
 
 
 def keyring():
-    return jk.JwtKeyring({"k1": SECRET})
+    return tk.TokenKeyring({"k1": SECRET})
 
 
 def test_valid_token_returns_payload():
