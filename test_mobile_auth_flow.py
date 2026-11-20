@@ -3,14 +3,14 @@ import hashlib
 
 import pytest
 
-import oauth_pkce as op
+import mobile_auth_flow as maf
 
 VERIFIER = "a" * 50
 CHALLENGE = base64.urlsafe_b64encode(hashlib.sha256(VERIFIER.encode()).digest()).rstrip(b"=").decode()
 
 
 def flow():
-    return op.PkceFlow({"client1"}, {"https://app.example/cb"}, ttl=60)
+    return maf.MobileAuthFlow({"client1"}, {"https://app.example/cb"}, ttl=60)
 
 
 def authorize(game, **overrides):

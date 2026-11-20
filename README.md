@@ -1,6 +1,6 @@
 # GSB Bugfix Task
 ## 题面
-移动端登录接完 PKCE，授权码开始被重复消费：同一串 code 第二次还能换出 access_token，回调地址只比对开头就放行，state 留空也照发，challenge 短得离谱不拦，verifier 和 challenge 根本不是一个东西也通过。oauth_pkce.py 的 PkceFlow 负责 authorize 和 exchange。要求 client 与回调地址精确匹配、state 非空、支持 S256 和 plain 两种模式、code 只能换一次且会过期、verifier 长度与摘要都要对；不认识的 client、非法 challenge、重复兑换直接抛 ValueError。
+移动端授权码流程在安全评审里被复现出一条重复兑换链：同一串授权码在第一次换到访问令牌后还能再换一次，回调地址只比到域名前缀就放行，会话状态值留空也能继续，挑战串长度不合法时没有拒绝，原始校验串和挑战串完全对不上也能拿到令牌。mobile_auth_flow.py 的 MobileAuthFlow 负责 authorize 和 exchange。实现要精确比对客户端和回调地址，会话状态值不能为空，支持 SHA-256 和明文两种模式，授权码只能消费一次并带过期时间，原始校验串的长度和摘要都要匹配；不认识的客户端、非法挑战串、重复兑换直接抛 ValueError。 同一客户端可能同时开多个授权会话，兑换时要确认授权码和发起时的客户端、回调地址、会话状态值属于同一条记录，不能跨会话拼接。
 
 ## 运行方式
 ```bash
