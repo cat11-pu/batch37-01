@@ -1,6 +1,6 @@
 # GSB Bugfix Task
 ## 题面
-会话管理一上多端就乱：登录后 session id 不换，攻击者预置的 id 直接变成登录态；空闲超时和绝对过期只算一个；touch 活动请求能把绝对过期一起续掉；注销只删本地缓存，服务端还能验过；旧 session 轮换后原 id 仍然有效。session_lifecycle.py 的 SessionStore 要实现 create、validate、touch、revoke 和 rotate。要同时校验空闲和绝对过期、touch 只续空闲、rotate 立即作废旧 id、注销后不可再用；未知 id 和非法时间抛 ValueError。
+会话管理接入多端后，安全评审发现登录后 session id 不换，攻击者预置的 id 直接变成登录态；空闲超时和绝对过期只算一个；touch 活动请求能把绝对过期一起续掉；注销只删本地缓存，服务端还能验过；旧 session 轮换后原 id 仍然有效。session_lifecycle.py 的 SessionStore 负责 create、validate、touch、revoke 和 rotate。实现要同时校验空闲和绝对过期，touch 只续空闲，rotate 立即作废旧 id，注销后不可再用；未知 id 和非法时间抛 ValueError。 同一用户会在手机、平板和网页同时登录，轮换一个会话不能影响其他设备；管理员强制下线时要能按用户批量吊销，而不是只删当前 id。
 
 ## 运行方式
 ```bash
