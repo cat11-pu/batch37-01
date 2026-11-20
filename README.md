@@ -9,7 +9,7 @@ python -m pytest tests -q
 
 ## 平台字段
 
-所属领域：游戏、图形与多媒体
+所属领域：安全
 子方向：游戏开发
 任务类型：Bugfix
 语言 / 框架：Python 3, pytest
